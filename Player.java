@@ -1,6 +1,6 @@
-package silvam;
+package zombieMaze;
 
-import silvam.Map;
+import zombieMaze.Map;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -12,6 +12,12 @@ import silvam.Map;
  * @author rohan
  */
 public class Player {
+
+public	static double normaliseAngle(double angleOffset) {
+	angleOffset+=Math.PI*2;
+	angleOffset%=Math.PI*2;
+	return angleOffset;
+	}
 
 	/**
 	 * @return the lasers
@@ -27,37 +33,32 @@ public class Player {
 		return grenades;
 	}
 
-	public static enum Direction {
-
-		/**
-		 * facing towards negative y
-		 */
-		up,//negative y
-		/**
-		 * facing towards positive y
-		 */
-		down,//positive y
-		/**
-		 * facing towards negative x
-		 */
-		left,//negative x
-		/**
-		 * facing towards positive x
-		 */
-		right //positive x
-	}
 	/**
-		* The direction this is facing
-		*/
-	public Direction direction = Direction.up;
+	 * @return the x coordinate
+	 */
+	public int getX() {
+		return (int) x;
+	}
+
+	/**
+	 * @return the y coordinate
+	 */
+	public int getY() {
+		return (int) y;
+	}
+
 /**
+	* Angle from facing up in radians
+	*/
+	public double angle=Math.PI;//player starts facing down
+	/**
 	* ammo for the laser gun
 	*/
-	private int lasers = 16;// Ima fire my laser!
+	private  int lasers = 24;// Ima fire my laser!
 /**
 	* number of grenades we have
 	*/
-	private int grenades = 2;//melee weapon
+	private int grenades = 5;//melee weapon
 	/**
 		* if the player is alive are not
 		*/
@@ -65,18 +66,19 @@ public class Player {
 	/**
 		* x coordinate
 		*/
-	public int x = 1;
+	public double x = 5.0;
 	/**
 		* y coordinate
 		*/
-	public int y = 1;
+	public double y = 5.0;
+
 /**
 	* shoots a laser which breaks the blocks in its range
 	*/
 	public void shoot() {
 		if(getLasers()>0){
 		lasers--;
-		new Laser(x,y);
+		new Laser(getX(), getY());
 		}
 		}
 /**
@@ -86,35 +88,36 @@ public class Player {
 	* @param move the move being made as a character 
 	*/
 	public void move(char move) {
-		//System.out.println(x+"|"+y);
-		int oldX = x;
-		int oldY = y;
-		Map.map[oldX][oldY] = 'o';
+		Map.map[getX()][getY()]='o';
+		dance:
+		{
+		int oldX = getX();
+		int oldY = getY();
 		if (move == 'w') {
-			direction = Direction.up;
-			y--;
+			x+=.5*Math.sin(angle);
+					y-=.5*Math.cos(angle);
 		} else if (move == 's') {
-			direction = Direction.down;
-			y++;
+						x-=.5*Math.sin(angle);
+					y+=.5*Math.cos(angle);
 		} else if (move == 'a') {
-			direction = Direction.left;
-			x--;
+			angle-=Math.PI/24;
+			angle%=2*Math.PI;
 		} else if (move == 'd') {
-			direction=Direction.right;
-		 x++;
+			angle+=Math.PI/24;
+			angle%=2*Math.PI;
 		} else if (move == ' ') {
 			if (Map.zombies != null) {
 				if (getGrenades() > 0) {
 					for (Zombie z : Map.zombies) {
 						if (z != null) {
 							int meleeDist = 5;
-							if (Math.sqrt(Math.pow(z.getX() - this.x, 2) + Math.pow(z.getY() - this.y, 2)) < meleeDist) {
+							if (Math.sqrt(Math.pow(z.getX() - this.getX(), 2) + Math.pow(z.getY() - this.getY(), 2)) < meleeDist) {
 								z.die();
 							}
 						}
 					}
-					for (int i = x - 3; i <= x + 3; i++) {
-						for (int j = y - 3; j <= y + 3; j++) {
+					for (int i = getX() - 3; i <= getX() + 3; i++) {
+						for (int j = getY() - 3; j <= getY() + 3; j++) {
 							try {
 								if (Map.map[i][j] == 'w' || Map.map[i][j] == 'z') {
 									Map.map[i][j] = 'o';
@@ -126,29 +129,41 @@ public class Player {
 					grenades--;
 				}
 			}
+			break dance;
 		} else if(move=='q'){
 			shoot();
+			break dance;
 		}
 		boolean open = false;
 		try {
-			open = Map.map[x][y] == 'o' || Map.map[x][y] == 'a'||Map.map[x][y] == 'g';
-			if (Map.map[x][y] == 'a') {
-				grenades += Utility.getRandom(5)==0?1:0;
-				lasers+=2+Utility.getRandom(3);
-			}
-				if (Map.map[x][y] == 'g') {
-	//gun upgrade kit
-					lasers+=5;
-				Laser.range+=2;
-				Laser.level++;
-			}
+			//if Map.pathFind at that coordinate is 0 then it is unreachable
+			//either a wall or a diagonal movement through a corner
+			open = Map.pathFind[getX()][getY()]!=0;
+		if(!open&&Map.pathFind[oldX][getY()]!=0){
+			open=true;
+			x=oldX;
+		}else if(!open&&Map.pathFind[getX()][oldY]!=0){
+			y=oldY;
+			open=true;
+		}
 		} catch (Exception e) {
 		}
 		if (!open) {
 			x = oldX;
 			y = oldY;
 		}
-		Map.map[x][y] = 'p';
+		}
 		Map.doPathFinding();
+	if(Map.map[getX()][getY()]=='a'){
+		lasers+=5;
+	grenades+=1;
+	}
+	else if(Map.map[getX()][getY()]=='g'){
+		lasers+=10;
+		Laser.range+=2;
+	 Laser.level+=1;
+		grenades+=2;
+	}
+				Map.map[getX()][getY()]='o';
 	}
 }
