@@ -4,7 +4,7 @@
 "The generation of random numbers is too important to be left to chance."
 -Robert coveyou
 */
-package silvam;
+package zombieMaze;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +24,7 @@ public class MazeHandler {
 	* side of the maze as walls
 	* recommended size 31
 	*/
-	 public static int size=50;
+	 public static int size=11;
 
 /**
 	* THe size along the y dimension
@@ -73,18 +73,18 @@ public	static int xSize = size;
 			findNewNode(nodes.get(nodes.size() - 1));
 		}
 
-int d=size/10+7;	
-//make little open dungeons
-		for(int x=d+3;x<size-d-3;x+=d){
-			for(int y=d+3;y<size-d-3;y+=d){
-				int xShift=Utility.getRandom(7)-3;
-				int yShift=Utility.getRandom(7)-3;
-				if(Utility.getRandom(100)<65){
-		makeGlade(x+xShift,y+yShift);
+int[][] copyMaze=maze.clone();
+maze=new int[size*5][size*5];
+for(int i=0;i<size;i++){
+	for(int j=0;j<size;j++){
+		for(int a =0;a<5;a++){
+			for(int b=0;b<5;b++){
+				maze[(5*i)+a][(5*j)+b]=copyMaze[i][j];
+			}
+		}
 	}
-		}
-		}
-	return maze.clone();
+}
+return maze;
 		}
 		
 	/**
@@ -152,30 +152,4 @@ int d=size/10+7;
 			IOSTRING u=new IOSTRING();
 			return u.getStringFromPopUp(prompt).toLowerCase().contains("y");
 		}
-	/**
-		* makes the little holes in the maze
-		* Almost like the glade in maze runner
-		* By glade radius it means the farthest distance away from the center cube
-		* the glade extends counting diagonals as only one unit of distance 
-		* (we use neither pythagoras nor taxicab norms)
-	 * @param centerX
-	 * @param centerY
-		*/
-	public static void makeGlade(int centerX,int centerY) {
-		int d=size/20+1;
-			for (int y = centerY- d; y <= centerY + d; y++) {
-				for (int x = centerX - d; x <= centerX + d; x++) {
-					try {
-						if(Math.abs(x-centerX)==d||Math.abs(y-centerY)==d){
-							
-						}else {
-							maze[y][x]=1;
-						}
-					} catch (Exception e) {
-						/**gotcha*/
-					}
-			}
-		}
-		
-	}
 }
