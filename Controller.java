@@ -1,7 +1,7 @@
 /**
 	* This is used to listen to the character moves typed in by the user
 	*/
-package silvam;
+package zombieMaze;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -11,9 +11,6 @@ import java.awt.event.KeyListener;
  * @author rohan
  */
 public class Controller implements KeyListener{
-
-
-	static final int SPEED=1;
 	@Override
 	/**
 		* does nothing when key typed instead key pressed is what we are using
@@ -29,7 +26,8 @@ public class Controller implements KeyListener{
 		*/
 	public void keyPressed(KeyEvent e) {
 		//System.out.println(e);
-		Map.p.move(e.getKeyChar());
+			Map.p.move(e.getKeyChar());
+
 	}
 
 	@Override
