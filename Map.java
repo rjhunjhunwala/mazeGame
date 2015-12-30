@@ -1,4 +1,4 @@
-package silvam;
+package zombieMaze;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,15 +22,6 @@ public static Player p;
 public static ArrayList<Zombie> zombies;
 public static int round;
 private static char[][] drawAMap(){
-	/*
-	String FILENAME="MAP.txt";
-	String[] mapW=file.getWordsFromFile(FILENAME);
-	map=new char[file.getLengthOfFile(FILENAME)][mapW.length];
-	int i=0;
-	for(String w: mapW){
-		map[i]=w.toCharArray();
-		i++;
-									*/
 	int[][] tempMap=MazeHandler.make2dMaze();
 	map=new char[tempMap.length][tempMap[0].length];
 	for(int i=0;i<tempMap.length;i++){
@@ -38,9 +29,18 @@ private static char[][] drawAMap(){
 				map[i][j]=	tempMap[i][j]==1?'o':'w';
 		}
 	}
-	map[1][1]='p';
+	map[0][0]='w';
+			return map;
+/*
+	String[] tempMaze=file.getWordsFromFile("map.txt");
+	map=new char[tempMaze.length][tempMaze[0].length()];
+	for(int i=0;i<tempMaze.length;i++){
+		map[i]=tempMaze[i].toCharArray();
+	}
 	return map;
-}	
+}
+			*/
+}
 /**
 	* Inefficient implementation of a naive pathfinding algorithm
 	* starts from the position of the player and "grows" out finding the number of 
@@ -51,13 +51,13 @@ private static char[][] drawAMap(){
 	*/
 	public static void doPathFinding() {
 	pathFind=new int[map.length][map[0].length];
-	pathFind[p.x][p.y]=1;
+	pathFind[p.getX()][p.getY()]=1;
 	int timesRun=map.length*map.length*3/5;//approximately the biggest distance between any two tiles
 				int worstCase=timesRun+1;//worst case path
 				int bestDecision=worstCase;//best neighboring tile to go to next
 				for(int a=0;a<timesRun;a++){
-	for(int i=0;i<map.length;i++){
-		for(int j=0;j<map[0].length;j++){
+	for(int i=0;i<pathFind.length;i++){
+		for(int j=0;j<pathFind[0].length;j++){
 			if(pathFind[i][j]==0&&map[i][j]!='w'){
 try{
 	if(pathFind[i+1][j]<bestDecision&&pathFind[i+1][j]!=0){
@@ -121,6 +121,7 @@ Laser.level=1;
 	}
 			zombies=null;
 		zombies=new ArrayList(1);
+		round=0;
 		while(p.alive){
 while(areZombies()){
 	try {
@@ -131,24 +132,24 @@ while(areZombies()){
 }
 round++;
 			try {
-				Thread.sleep(1000+5000/round);
+				Thread.sleep(2000+6000/round);
 			} catch (InterruptedException ex) {
 				Logger.getLogger(Map.class.getName()).log(Level.SEVERE, null, ex);
 			}
-			int difficulty=round;
-								int zDist=1+(int) (Math.sqrt(round)+Utility.getRandom(2));//minimum distance for zombies spawn
-					int maxDist=14+(int) (Math.sqrt(round)+Utility.getRandom(2));//maxZombie Distance
+			int difficulty=(int) Math.sqrt(round+2)+ (int) (round/9.0);
+								int zDist=4+(int) (Math.sqrt(round)+Utility.getRandom(2));//minimum distance for zombies spawn
+					int maxDist=13+(int) (Math.sqrt(round)+Utility.getRandom(2));//maxZombie Distance
 			for(int i=0;i<map.length;i++){
 				for(int j=0;j<map[0].length;j++){
-					if(Utility.getRandom(1000+50*round)<=2&&map[i][j]=='o'){
+					if(Utility.getRandom(600+40*round)<=2&&map[i][j]=='o'){
 						map[i][j]='a';
 					}
-										if(Utility.getRandom(6000+(75*round))<=1&&map[i][j]=='o'){
+										if(Utility.getRandom(3500+(55*round))<=1&&map[i][j]=='o'){
 						map[i][j]='g';
 					}
-					if((Utility.getRandom(100)<difficulty)&&
-													(Math.sqrt(Math.pow(p.x-i,2)+Math.pow(p.y-j, 2)))>zDist&&map[i][j]=='o'
-													&&(Math.sqrt(Math.pow(p.x-i,2)+Math.pow(p.y-j, 2)))<maxDist){
+					if((Utility.getRandom(250)<difficulty)&&
+													(Math.sqrt(Math.pow(p.getX()-i,2)+Math.pow(p.getY()-j, 2)))>zDist&&map[i][j]=='o'
+													&&j>9&&pathFind[i][j]!=0){
 						Zombie z=new Zombie(i,j);
 						zombies.add(z);
 						map[i][j]='z';
