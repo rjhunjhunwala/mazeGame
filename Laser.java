@@ -1,18 +1,22 @@
-package silvam;
+package zombieMaze;
+
 /**
  *
  * @author rohan
  */
 public class Laser {
-public static int level=1;
+
+	public static int level = 1;
 	public static int range = 5;//this is the range and can be upgraded in game
 	public int x;
 	public int y;
-/**
-	* creates a laser and lets it do its thing
-	* @param inX
-	* @param inY 
-	*/
+
+	/**
+	 * creates a laser and lets it do its thing
+	 *
+	 * @param inX
+	 * @param inY
+	 */
 	public Laser(int inX, int inY) {
 		x = inX;
 		y = inY;
@@ -20,87 +24,30 @@ public static int level=1;
 	}
 
 	/**
-	 * Goes through and destroys everything in its range
-		* my apologies for the name. It will not change @notTODO change the name
+	 * Goes through and destroys everything in its range my apologies for the name.
+	 * It will not change @notTODO change the name
 	 */
 	public void fireMahLaser() {
-		switch (Map.p.direction) {
-			case up:
-				for (int i = 1; i <= range; i++) {
-					try {
-							if(Map.map[x][y - i] == 'w'||Map.map[x][y - i] == 'z') {
-								Map.map[x][y - i] = 'o';
-							}
-					} catch (Exception e) {
-					}
-					if (Map.zombies != null) {
-						for (Zombie z : Map.zombies) {
-							if (z != null) {
-								if (z.getX() == x && z.getY() == y - i) {
-									z.die();
-								}
-							}
+		for (double i = 1; i <= range; i += .05) {
+			try {
+				if (Map.map[(int) (x + (i * Math.sin(Map.p.angle)))][(int) (y - (i * Math.cos(Map.p.angle)))] == 'w'
+												|| Map.map[(int) (x + (i * Math.sin(Map.p.angle)))][(int) (y - (i * Math.cos(Map.p.angle)))] == 'z') {
+					Map.map[(int) (x + (i * Math.sin(Map.p.angle)))][(int) (y - (i * Math.cos(Map.p.angle)))] = 'o';
+				}
+			} catch (Exception e) {
+				//System.out.println("HUH! Exception"+e);
+			}
+			if (Map.zombies != null) {
+				for (Zombie z : Map.zombies) {
+					if (z != null) {
+						if ((z.getY() == ((int) (y - (i * Math.cos(Map.p.angle)))))) {
+													if ((z.getX() == ((int) (x+ (i * Math.sin(Map.p.angle)))))) {
+							z.die();
 						}
 					}
 				}
-				break;
-			case left:
-				for (int i = 1; i <= range; i++) {
-					try {
-							if(Map.map[x - i][y]=='w'||Map.map[x - i][y]=='z'){
-						Map.map[x - i][y] = 'o';
-							}
-					} catch (Exception e) {
-					}
-					if (Map.zombies != null) {
-						for (Zombie z : Map.zombies) {
-							if (z != null) {
-								if (z.getX() == x - i && z.getY() == y) {
-									z.die();
-								}
-							}
-						}
-					}
-				}
-				break;
-			case right:
-				for (int i = 1; i <= range; i++) {
-					try {
-						if (Map.map[x + i][y]=='w'||Map.map[x + i][y]=='z') {
-							Map.map[x + i][y] = 'o';
-						}
-					} catch (Exception e) {
-					}
-					if (Map.zombies != null) {
-						for (Zombie z : Map.zombies) {
-							if (z != null) {
-								if (z.getX() == x + i && z.getY() == y) {
-									z.die();
-								}
-							}
-						}
-					}
-				}
-				break;
-			case down:
-				for (int i = 1; i <= range; i++) {
-					try {
-						if (Map.map[x][y + i] == 'w'||Map.map[x][y + i] == 'z') {
-							Map.map[x][y + i] = 'o';
-						}
-					} catch (Exception e) {
-					}
-					if (Map.zombies != null) {
-						for (Zombie z : Map.zombies) {
-							if (z != null) {
-								if (z.getX() == x && z.getY() == y + i) {
-									z.die();
-								}
-							}
-						}
-					}
-				}
-				break;
+			}
 		}
+	}
 	}
 }
