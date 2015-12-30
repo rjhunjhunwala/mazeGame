@@ -1,4 +1,4 @@
-package silvam;
+package zombieMaze;
 
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -42,7 +42,7 @@ public Zombie(int inX,int inY){
 		life:
 		while(isAlive()&&Map.p.alive){
 			try{
-			Thread.sleep(500);
+			Thread.sleep(650);
 			}catch(Exception e){}
 			int oldX=x;
 		int oldY=y;
@@ -91,13 +91,13 @@ public Zombie(int inX,int inY){
 y=movementCoords[1];
 	}
 							
-								if(Math.abs(this.x-Map.p.x)+Math.abs(this.y-Map.p.y)<2&&isAlive()){
+								if(Math.abs(this.x-Map.p.getX())+Math.abs(this.y-Map.p.getY())<=1.42&&isAlive()){
 				try {
-					Thread.sleep(350);//how long it takes a zombie to reach its hand out and kill you
+					Thread.sleep(1000);//how long it takes a zombie to reach its hand out and kill you
 				} catch (InterruptedException ex) {
 					Logger.getLogger(Zombie.class.getName()).log(Level.SEVERE, null, ex);
 				}
-										if(Math.abs(this.x-Map.p.x)+Math.abs(this.y-Map.p.y)<2&&isAlive()){		
+										if(Math.abs(this.x-Map.p.x)+Math.abs(this.y-Map.p.y)<1.42&&isAlive()){		
 		Map.p.alive=false;//Game Over!
 		break life;
 										}
